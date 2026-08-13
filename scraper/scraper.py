@@ -40,7 +40,9 @@ def parse_book_card(card, category):
     title = card.h3.a["title"]
 
     price_text = card.select_one(".price_color").get_text(strip=True)
-    price = float(price_text.replace("£", "").replace("Â", ""))
+    # the site serves the £ sign as "Â£" depending on encoding, strip both
+    price_text = price_text.replace("Â", "").replace("£", "")
+    price = float(price_text)
 
     rating_class = card.select_one(".star-rating")["class"]
     rating_word = [c for c in rating_class if c != "star-rating"][0]
