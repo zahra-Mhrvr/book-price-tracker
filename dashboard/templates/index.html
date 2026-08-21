@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Price Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+        }
+        h1 { margin-bottom: 0; }
+        .subtitle { color: #777; margin-top: 4px; }
+        .stat {
+            display: inline-block;
+            background: #f4f4f4;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin: 10px 10px 20px 0;
+        }
+        .stat strong { display: block; font-size: 1.4em; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+        th { color: #555; font-weight: 600; }
+        canvas { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Book Price Tracker</h1>
+    <p class="subtitle">Scraped from books.toscrape.com</p>
+
+    <div class="stat">
+        <strong>{{ total_books }}</strong>
+        books tracked
+    </div>
+    <div class="stat">
+        <strong>{{ categories|length }}</strong>
+        categories
+    </div>
+
+    <canvas id="categoryChart" height="90"></canvas>
+
+    <h2>Average price by category</h2>
+    <table>
+        <tr><th>Category</th><th>Books</th><th>Avg. price</th></tr>
+        {% for c in categories %}
+        <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.count }}</td>
+            <td>£{{ c.avg_price }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        const ctx = document.getElementById('categoryChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ categories|map(attribute='name')|list|tojson }},
+                datasets: [{
+                    label: 'Average price (£)',
+                    data: {{ categories|map(attribute='avg_price')|list|tojson }},
+                    backgroundColor: '#4c78a8'
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    </script>
+</body>
+</html>
